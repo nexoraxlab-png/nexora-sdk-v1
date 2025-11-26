@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
-
+const gptRoutes = require("./routes/gpt");
+const affiliateRoutes = require("./routes/affiliate");
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -10,7 +11,8 @@ app.use(cors());
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK", message: "Nexora SDK is running." });
 });
-
+app.use("/api/gpt", gptRoutes);
+app.use("/api/affiliate", affiliateRoutes);
 // GPT Endpoint
 app.post("/api/generate", async (req, res) => {
   try {
