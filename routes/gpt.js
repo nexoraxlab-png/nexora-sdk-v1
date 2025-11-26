@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const axios = require("axios");
 
-// GPT generation (placeholder - will use real API key later)
 router.post("/generate", async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -10,11 +10,24 @@ router.post("/generate", async (req, res) => {
       return res.status(400).json({ error: "Missing prompt" });
     }
 
-    const result = `Generated response for: ${prompt}`;
+    const response = await axios.post(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.openai_api_key}`,
+        },
+      }
+    );
 
-    res.json({ text: result });
+    res.json({ result: response.data.choices[0].message.content });
   } catch (error) {
-    res.status(500).json({ error: "Server Error", details: error.message });
+    console.error("GPT Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "GPT request failed" });
   }
 });
 
